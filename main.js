@@ -36,7 +36,7 @@ searchButton.addEventListener("click", getUserId);
 function renderUserInfo() {
   userHTML = ``;
   userHTML += `닉네임 : ${data.nickname}<br>
-    레벨 : ${data.level}`;
+    레벨 : ${data.level}<hr>`;
   document.getElementById("user-board").innerHTML = userHTML;
 }
 
@@ -56,20 +56,25 @@ async function getMatchDetail(){
     let header = new Headers({
         Authorization: Authorization,
     })
-    for(i=0;i<matchData.length;i++){
+      matchHTML=``
+        for(i=0;i<matchData.length;i++){
         const url =`https://api.nexon.co.kr/fifaonline4/v1.0/matches/${matchData[i]}`
         const response = await fetch(url, {headers: header});
         let data = await response.json()
         let matchDate = data.matchDate
-        console.log(matchDate)
+        //console.log(matchDate)
         let matchPlayer1 = data.matchInfo[0].nickname
         let matchPlayer2 = data.matchInfo[1].nickname
         let player1Result = data.matchInfo[0].matchDetail.matchResult
         let player2Result = data.matchInfo[1].matchDetail.matchResult
-        console.log(matchPlayer1,player1Result,matchPlayer2,player2Result);
+        //console.log(matchPlayer1,player1Result,matchPlayer2,player2Result);
         let player1Goal = data.matchInfo[0].shoot.goalTotal
         let player2Goal = data.matchInfo[1].shoot.goalTotal
-        console.log(player1Goal,player2Goal)
+        //console.log(player1Goal,player2Goal)
+        matchHTML += `${matchDate} <br>
+        ${matchPlayer1}(${player1Result}) VS ${matchPlayer2}(${player2Result}) <br>
+        ${player1Goal}, ${player2Goal}<hr>`
+        document.getElementById("match-board").innerHTML = matchHTML
     }    
 }
 
