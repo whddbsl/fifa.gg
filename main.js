@@ -26,14 +26,12 @@ function getUserId() {
       //console.log(data);
       //console.log(accessID);
       renderUserInfo();
-      return Promise.all([getUserMatch(),getMatchDetail()])
+      return Promise.all([getUserMatch(), getMatchDetail()]);
     })
     .catch((error) => {
       console.error(error);
     });
 }
-
-
 
 function renderUserInfo() {
   userHTML = ``;
@@ -42,16 +40,17 @@ function renderUserInfo() {
   document.getElementById("user-board").innerHTML = userHTML;
 }
 
-let matchData = []
-async function getUserMatch(){//유저 친선경기 매치 목록 불러오기
-    let header = new Headers({
-        Authorization: Authorization,
-    })
-    const url = `https://api.nexon.co.kr/fifaonline4/v1.0/users/${accessID}/matches?matchtype=40&offset=0&limit=20`
-    const response = await fetch(url, {headers: header});
-    matchData = await response.json();
-    //console.log(matchData)
-    return matchData;
+let matchData = [];
+async function getUserMatch() {
+  //유저 친선경기 매치 목록 불러오기
+  let header = new Headers({
+    Authorization: Authorization,
+  });
+  const url = `https://api.nexon.co.kr/fifaonline4/v1.0/users/${accessID}/matches?matchtype=40&offset=0&limit=20`;
+  const response = await fetch(url, { headers: header });
+  matchData = await response.json();
+  //console.log(matchData)
+  return matchData;
 }
 async function getMatchDetail() {
   const matchData = await getUserMatch();
@@ -80,10 +79,10 @@ async function getMatchDetail() {
   }
 }
 
-let allButton = document.getElementById("all-button")
+let allButton = document.getElementById("all-button");
 
 allButton.addEventListener("click", () => {
-  getUserId()
-    getUserMatch()
-    getMatchDetail()
+  getUserId();
+  getUserMatch();
+  getMatchDetail();
 });
