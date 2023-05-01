@@ -3,12 +3,13 @@ const Authorization =
 let inputNickName = "";
 let searchButton = document.getElementById("search-button");
 let userInput = document.getElementById("user-input"); // 유저가 입력한 닉네임 가져오기
-let matchButton = document.getElementById("match-button")
-let resultButton = document.getElementById("result-button")
+let matchButton = document.getElementById("match-button");
+let resultButton = document.getElementById("result-button");
 
 let data = null; // 전역 변수로 선언
 let accessID = null; //
-function getUserId() {// 유저 고유 식별자 가져오기
+function getUserId() {
+  // 유저 고유 식별자 가져오기
   inputNickName = userInput.value;
   async function getData() {
     let header = new Headers({
@@ -22,16 +23,17 @@ function getUserId() {// 유저 고유 식별자 가져오기
     .then((result) => {
       data = result; // 전역 변수에 결과 저장
       accessID = data.accessId;
-      console.log(data);
-      console.log(accessID);
+      //console.log(data);
+      //console.log(accessID);
       renderUserInfo();
+      return Promise.all([getUserMatch(),getMatchDetail()])
     })
     .catch((error) => {
       console.error(error);
     });
 }
 
-searchButton.addEventListener("click", getUserId);
+
 
 function renderUserInfo() {
   userHTML = ``;
@@ -48,36 +50,41 @@ async function getUserMatch(){//유저 친선경기 매치 목록 불러오기
     const url = `https://api.nexon.co.kr/fifaonline4/v1.0/users/${accessID}/matches?matchtype=40&offset=0&limit=20`
     const response = await fetch(url, {headers: header});
     matchData = await response.json();
-    console.log(matchData)
+    //console.log(matchData)
+    return matchData;
 }
-
-
-async function getMatchDetail(){
-    let header = new Headers({
-        Authorization: Authorization,
-    })
-      matchHTML=``
-        for(i=0;i<matchData.length;i++){
-        const url =`https://api.nexon.co.kr/fifaonline4/v1.0/matches/${matchData[i]}`
-        const response = await fetch(url, {headers: header});
-        let data = await response.json()
-        let matchDate = data.matchDate
-        //console.log(matchDate)
-        let matchPlayer1 = data.matchInfo[0].nickname
-        let matchPlayer2 = data.matchInfo[1].nickname
-        let player1Result = data.matchInfo[0].matchDetail.matchResult
-        let player2Result = data.matchInfo[1].matchDetail.matchResult
-        //console.log(matchPlayer1,player1Result,matchPlayer2,player2Result);
-        let player1Goal = data.matchInfo[0].shoot.goalTotal
-        let player2Goal = data.matchInfo[1].shoot.goalTotal
-        //console.log(player1Goal,player2Goal)
-        matchHTML += `${matchDate} <br>
+async function getMatchDetail() {
+  const matchData = await getUserMatch();
+  let header = new Headers({
+    Authorization: Authorization,
+  });
+  matchHTML = ``;
+  for (i = 0; i < matchData.length; i++) {
+    const url = `https://api.nexon.co.kr/fifaonline4/v1.0/matches/${matchData[i]}`;
+    const response = await fetch(url, { headers: header });
+    let data = await response.json();
+    let matchDate = data.matchDate;
+    //console.log(matchDate)
+    let matchPlayer1 = data.matchInfo[0].nickname;
+    let matchPlayer2 = data.matchInfo[1].nickname;
+    let player1Result = data.matchInfo[0].matchDetail.matchResult;
+    let player2Result = data.matchInfo[1].matchDetail.matchResult;
+    //console.log(matchPlayer1,player1Result,matchPlayer2,player2Result);
+    let player1Goal = data.matchInfo[0].shoot.goalTotal;
+    let player2Goal = data.matchInfo[1].shoot.goalTotal;
+    //console.log(player1Goal,player2Goal)
+    matchHTML += `${matchDate} <br>
         ${matchPlayer1}(${player1Result}) VS ${matchPlayer2}(${player2Result}) <br>
-        ${player1Goal}, ${player2Goal}<hr>`
-        document.getElementById("match-board").innerHTML = matchHTML
-    }    
+        ${player1Goal}, ${player2Goal}<hr>`;
+    document.getElementById("match-board").innerHTML = matchHTML;
+  }
 }
 
-resultButton.addEventListener("click",getMatchDetail)
-matchButton.addEventListener("click",getUserMatch)
+let allButton = document.getElementById("all-button")
 
+allButton.addEventListener("click", () => {
+  getUserId()
+    .then(getUserMatch)
+    .then(getMatchDetail)
+    .catch((error) => console.error(error));
+});
