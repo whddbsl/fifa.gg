@@ -84,7 +84,6 @@ let allButton = document.getElementById("all-button")
 
 allButton.addEventListener("click", () => {
   getUserId()
-    .then(getUserMatch)
-    .then(getMatchDetail)
-    .catch((error) => console.error(error));
+    getUserMatch()
+    getMatchDetail()
 });
